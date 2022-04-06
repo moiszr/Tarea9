@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAj74RKBd0vUmxnIqM0/ht7QAAAAACAAAAAAAQZgAAAAEAACAAAACnxkzjC6EQuKtmEJt3ikL/UadDQoa/ZidZZYxZke05WwAAAAAOgAAAAAIAACAAAAB66hmSoDujw7yXESpFjx5Cfz40hNxtwx8IWP4HyaMaqiAAAAAn+nXPBm14Zslu8BeK5ik5CiegMYbKVno2XV4WZW8XJUAAAADrxtqVXqCYKaVN6a3x5ACBVdMHPnC0qGEkaneJvfhlUvhD9mUgNXLfu8FkMytG8PVk6hsrOxTtdXxvqdAA+p7h</EncryptedPassword>
+    <_PublishTargetUrl>ftp://198.37.116.29/www.solicitudvacuna.somee.com</_PublishTargetUrl>
+    <History>False|2022-04-06T00:38:30.4847293Z;</History>
+  </PropertyGroup>
+</Project>

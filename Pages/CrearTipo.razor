@@ -1,0 +1,41 @@
+﻿@page "/createTipoSangre"
+@using Tarea9.Data
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Crear Tipo</PageTitle>
+
+<h4>Crear Tipo Sangre</h4>
+
+<div class="row">
+    <EditForm Model="_tipoSangreToCreate"OnInvalidSubmit="CreateTipoSangre" class="col s12">
+        <div class="row">
+            <div class="input-field col s12">
+                <b>Tipo de Sangre</b>
+                <InputText @bind-Value="_tipoSangreToCreate.Name" class="validate" id="tiposangre" placeholder="Tipo de Sangre" />
+            </div>
+        </div>
+        
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <button @onclick="() => CreateTipoSangre()" class="btn btn-success" type="submit">Guardar</button>
+        <a href="/" class="btn btn-secondary">Cancelar</a>
+    </EditForm>
+</div>
+
+@code {
+    [Inject] DbConnection? connection { get; set; }
+    [Inject] NavigationManager? navigationManager { get; set; }
+
+    private TipoSangre _tipoSangreToCreate = new TipoSangre {};
+
+    private void CreateTipoSangre()
+    {
+        if (navigationManager != null && connection?.TipoSangres != null && connection != null && _tipoSangreToCreate.Name != null)
+        {
+            connection.TipoSangres.Add(_tipoSangreToCreate);
+            connection.SaveChangesAsync();
+            navigationManager.NavigateTo("/");
+        }
+    }
+}

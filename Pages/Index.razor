@@ -1,0 +1,103 @@
+﻿@page "/"
+@using Tarea9.Data
+@using Microsoft.EntityFrameworkCore
+
+<PageTitle>Registro Vacunacion Covid-19</PageTitle>
+
+<h1 class="mt-5">Listado de clientes</h1>
+
+<a href="/crearCliente" class="waves-effect waves-light btn mt-5">Nueva Persona </a>
+
+<div class="row mt-5">
+    <div class="col">
+        <RadzenGoogleMap style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 18.8740559, Lng = -70.4577745 })>
+            <Markers>
+                @foreach(var item in _clientes)
+                {
+                    <RadzenGoogleMapMarker Title="@item.Nombre" Label="@item.Nombre" Position=@(new GoogleMapPosition() { Lat = @item.Latitude, Lng = @item.Longitude }) />
+                }
+            </Markers>
+        </RadzenGoogleMap>
+    </div>
+</div>
+
+<div class="responsive-table mt-5">
+    <table class="striped">
+        <thead>
+            <tr>
+                <th scope="col">Id</th>
+                <th scope="col">Cedula</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Apellido</th>
+                <th scope="col">Telefono</th>
+                <th scope="col">Correo Electronico</th>
+                <th scope="col">Fecha de nacimiento</th>
+                <th scope="col">Tipo de Sangre</th>
+                <th scope="col">Provincia</th>
+                <th scope="col">Direccion</th>
+                <th scope="col">latitud</th>
+                <th scope="col">Longitud</th>
+                <th scope="col">¿Le ha dado covid?</th>
+                <th scope="col">Justificación</th>
+                <th scope="col">CRUD</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (_clientes != null)
+            {
+                foreach (var clientes in _clientes)
+                {
+                    <tr>
+                        <td>@clientes.Id</td>
+                        <td>@clientes.Cedula</td>
+                        <td>@clientes.Nombre</td>
+                        <td>@clientes.Apellido</td>
+                        <td>@clientes.Telefono</td>
+                        <td>@clientes.Email</td>
+                        <td>@clientes.FechaNacimiento.ToString("dd/M/yyyy")</td>
+                        <td>@clientes.TipoSangre?.Name</td>
+                        <td>@clientes.Provincia</td>
+                        <td>@clientes.Direccion</td>
+                        <td>@clientes.Latitude</td>
+                        <td>@clientes.Longitude</td>
+                        <td>@clientes.lehadadocovid</td>
+                        <td>@clientes.Justificacion</td>
+
+                        <td>
+                            <button class="waves-effect waves-blue lighten-3 btn" @onclick="() => DeleteClientes(clientes)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@code
+{
+    [Inject] DbConnection? crudDb { get; set; }
+    private List<Cliente> _clientes = new List<Cliente>();
+    private List<TipoSangre> _tiposangre = new List<TipoSangre>();
+
+    int zoom = 8;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(crudDb?.Cliente != null && crudDb?.TipoSangres != null)
+        {
+            _clientes = await crudDb!.Cliente.ToListAsync();
+            _tiposangre = await crudDb.TipoSangres.ToListAsync();
+        }
+    }
+
+    private async Task DeleteClientes(Cliente clienteDelete)
+    {
+        if(crudDb?.Cliente != null)
+        {
+            crudDb.Cliente.Remove(clienteDelete);
+            await crudDb.SaveChangesAsync();
+            _clientes.Remove(clienteDelete);
+            StateHasChanged();
+        }
+    }
+}

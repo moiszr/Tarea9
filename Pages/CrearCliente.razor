@@ -1,0 +1,168 @@
+﻿@page "/crearCliente"
+@using Tarea9.Data
+@using Microsoft.EntityFrameworkCore
+@using Radzen.Blazor;
+@inject IJSRuntime JsRuntime
+
+
+<PageTitle>Registraccion</PageTitle>
+
+<h4 class="mt-5">Crear nuevo Cliente</h4>
+
+<div class="row mt-5">
+    <EditForm Model="_clienteToCreate"OnInvalidSubmit="CreateCliente" class="col s12">
+        <div class="row">
+            <div class="input-field col s12">
+                <b>Cedula</b>
+                <InputText @bind-Value="_clienteToCreate.Cedula" class="validate" id="personaCedula"/>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="input-field col s6">
+                <b>Nombre</b>
+                <InputText @bind-Value="_clienteToCreate.Nombre" class="validate" id="personaNombre"/>
+            </div>
+
+            <div class="input-field col s6">
+                <b>Apellido</b>
+                <InputText @bind-Value="_clienteToCreate.Apellido" class="validate" id="personaApellido"/>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="input-field col s6">
+                <b>Teléfono</b>
+                <InputText @bind-Value="_clienteToCreate.Telefono" class="validate" id="personaTelefono"/>
+            </div>
+
+            <div class="input-field col s6">
+                <b>Correo Electronico</b>
+                <InputText @bind-Value="_clienteToCreate.Email" class="validate" id="personaEmail" />
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="input-field col s6">
+                <b>Fecha de Nacimiento</b>
+                <InputDate @bind-Value="_clienteToCreate.FechaNacimiento" class="validate" id="personaFeNacimiento" />
+            </div>
+
+            <div class="input-field col s6">
+                <b>Tipo de Sangre</b>
+                <InputSelect @bind-Value="_clienteToCreate.IdTipo" class="form-control" id="personaTipoSangre">
+                    @foreach (var tipo in _tipoSangre)
+                    {
+                        <option value="@tipo.Id">@tipo.Name</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="input-field col s12">
+                <b>Provincia</b>
+                <InputText @bind-Value="_clienteToCreate.Provincia" class="validate" id="personaProvincia" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="input-field col s12">
+                <b>Dirección</b>
+                <InputText @bind-Value="_clienteToCreate.Direccion" class="validate" id="personaDireccion" />
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="input-field col s12">
+                <b>Latitud y Longitud (Haga click en su posicción en el mapa)</b>
+                <div class="row">
+                    <div class="row p-3">
+                        <div class="col">
+                            <RadzenGoogleMap style="height: 400px" Zoom=@zoom Center=@(new GoogleMapPosition() { Lat = 18.8740559, Lng = -70.4577745 }) MapClick=@OnMapClick MarkerClick=@OnMarkerClick>
+                            </RadzenGoogleMap>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="input-field col s6">
+                        <b>Latitud</b>
+                        <InputNumber @bind-Value="_clienteToCreate.Latitude" class="validate" id="personaLatitude" />
+                    </div>
+
+                    <div class="input-field col s6">
+                        <b>Longitud</b>
+                        <InputNumber @bind-Value="_clienteToCreate.Longitude" class="validate" id="personaLongitude" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="input-field col s12">
+                <b>¿Le ha dado Covid?</b>
+                <InputSelect @bind-Value="_clienteToCreate.lehadadocovid" class="form-control" id="personaLehadadocovid">
+                    <option value=true>Si</option>
+                    <option value=false>No</option>
+                </InputSelect>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="input-field col s12">
+                <b>Justifique porque deben vacunarlo en su casa.</b>
+                <InputTextArea @bind-Value="_clienteToCreate.Justificacion" class="materialize-textarea" id="personaJustificacion" />
+            </div>
+        </div>
+        
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <button @onclick="CreateCliente" class="waves-effect waves-light btn">Guardar</button>
+        <a href="/" class="waves-effect waves-light btn">Cancelar</a>
+    </EditForm>
+</div>
+
+@code {
+    [Inject] DbConnection? connection { get; set; }
+    [Inject] NavigationManager? navigationManager { get; set; }
+
+    int zoom = 7;
+
+    private Cliente _clienteToCreate = new Cliente {};
+    private List<TipoSangre> _tipoSangre = new List<TipoSangre>();
+    MensajeEmail ms = new MensajeEmail();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (connection?.TipoSangres != null)
+        {
+            _tipoSangre = await connection.TipoSangres.ToListAsync();
+        }
+    }
+
+    private void CreateCliente()
+    {
+        if (navigationManager != null && connection?.Cliente != null && connection != null && _clienteToCreate.Cedula != null && _clienteToCreate.Nombre != null && _clienteToCreate.Apellido != null && _clienteToCreate.Telefono != null && _clienteToCreate?.Email != null && _clienteToCreate?.FechaNacimiento != null && _clienteToCreate?.IdTipo != null && _clienteToCreate?.Provincia != null && _clienteToCreate?.Direccion != null && _clienteToCreate?.Latitude != null && _clienteToCreate?.Longitude != null && _clienteToCreate?.lehadadocovid != null && _clienteToCreate?.Justificacion != null)
+        {
+            connection.Cliente.Add(_clienteToCreate);
+            connection.SaveChangesAsync();
+            ms.Correo(_clienteToCreate);
+            navigationManager.NavigateTo("/");
+            JsRuntime.InvokeVoidAsync("alert", "Datos Guardados!, Gracias por Registrase para la vacuna. Se ha enviado una copia de los datos a su correo.");
+        }
+    }
+
+    void OnMapClick(GoogleMapClickEventArgs args)
+    {
+        _clienteToCreate.Latitude = args.Position.Lat;
+        _clienteToCreate.Longitude = args.Position.Lng;
+    }
+
+    void OnMarkerClick(RadzenGoogleMapMarker marker)
+    {
+        _clienteToCreate.Latitude = marker.Position.Lat;
+        _clienteToCreate.Longitude = marker.Position.Lng;
+    }
+}
